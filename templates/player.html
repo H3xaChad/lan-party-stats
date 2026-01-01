@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{{ player.display_name or player.username }} - Player Stats{% endblock %}
+
+{% block content %}
+<div class="player-header">
+    <div class="player-info-row">
+        <img src="{{ player.avatar_url or 'https://cdn.discordapp.com/embed/avatars/' ~ ((player.user_id // 4194304) % 6) ~ '.png?size=256' }}" alt="{{ player.display_name or player.username }}" class="player-avatar-large" loading="lazy">
+        <div class="player-name-section">
+            <h1 class="player-name">{{ player.display_name or player.username }}</h1>
+        </div>
+        <article class="stat-card">
+            <header>⏱️ Total Playtime</header>
+            <h2>{{ player.total_playtime_readable }}</h2>
+        </article>
+    </div>
+</div>
+
+<section class="games-section">
+    <h2>🎮 Games Played</h2>
+    <p class="section-subtitle">All games ranked by playtime</p>
+    
+    {% if player.games %}
+    <div class="table-container">
+        <table class="games-table">
+            <thead>
+                <tr>
+                    <th class="rank-col">Rank</th>
+                    <th class="game-name-col">Game</th>
+                    <th class="playtime-col">Playtime</th>
+                    <th class="hours-col">Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in player.games %}
+                <tr class="game-row {% if loop.index == 1 %}top-game{% endif %}">
+                    <td class="rank-cell">
+                        {% if loop.index == 1 %}
+                            <span class="medal gold">🥇</span>
+                        {% elif loop.index == 2 %}
+                            <span class="medal silver">🥈</span>
+                        {% elif loop.index == 3 %}
+                            <span class="medal bronze">🥉</span>
+                        {% else %}
+                            <strong>{{ loop.index }}</strong>
+                        {% endif %}
+                    </td>
+                    <td class="game-name-cell">
+                        <strong>{{ game.name }}</strong>
+                    </td>
+                    <td class="playtime-cell">
+                        {{ game.readable }}
+                    </td>
+                    <td class="hours-cell">
+                        {{ game.hours }}h
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="no-data">No game data available yet</p>
+    {% endif %}
+</section>
+
+<section class="spotify-section">
+    <h2>🎵 Spotify Listening History</h2>
+    <p class="section-subtitle">All tracks ranked by listening time</p>
+    
+    {% if spotify.top_tracks %}
+    <div class="spotify-summary">
+        <div class="summary-stat">
+            <span class="label">Total Listening Time</span>
+            <span class="value">{{ spotify.readable }} ({{ spotify.hours }}h)</span>
+        </div>
+        <div class="summary-stat">
+            <span class="label">Unique Tracks</span>
+            <span class="value">{{ spotify.tracks_count }}</span>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="spotify-table">
+            <thead>
+                <tr>
+                    <th class="rank-col">Rank</th>
+                    <th class="track-col">Track</th>
+                    <th class="artist-col">Artist</th>
+                    <th class="album-col">Album</th>
+                    <th class="playtime-col">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for track in spotify.top_tracks %}
+                <tr class="track-row">
+                    <td class="rank-cell">
+                        {% if loop.index == 1 %}
+                            <span class="medal gold">🥇</span>
+                        {% elif loop.index == 2 %}
+                            <span class="medal silver">🥈</span>
+                        {% elif loop.index == 3 %}
+                            <span class="medal bronze">🥉</span>
+                        {% else %}
+                            <strong>{{ loop.index }}</strong>
+                        {% endif %}
+                    </td>
+                    <td class="track-cell">
+                        <strong>{{ track.title }}</strong>
+                    </td>
+                    <td class="artist-cell">
+                        {{ track.artist }}
+                    </td>
+                    <td class="album-cell">
+                        <small>{{ track.album or 'N/A' }}</small>
+                    </td>
+                    <td class="playtime-cell">
+                        {{ track.readable }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="no-data">No Spotify data available yet</p>
+    {% endif %}
+</section>
+
+<div class="back-button-container">
+    <a href="/leaderboard" role="button" class="secondary back-button">← Back to Leaderboard</a>
+</div>
+
+{% endblock %}

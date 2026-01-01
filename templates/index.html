@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LAN Party Stats{% endblock %}
+
+{% block content %}
+<header class="leaderboard-header">
+    <h1>Overview</h1>
+    <p>Real-time statistics from your Discord server</p>
+</header>
+
+<div class="grid" id="overview-stats" hx-get="/htmx/overview-stats" hx-trigger="every 30s" hx-swap="outerHTML">
+    <article>
+        <header>👥 Tracked Players</header>
+        <h2>{{ overview.unique_players }}</h2>
+    </article>
+
+    <article>
+        <header>🎮 Total Playtime</header>
+        <h2>{{ overview.total_game_readable }}</h2>
+    </article>
+    
+    <article>
+        <header>🎯 Games Played</header>
+        <h2>{{ overview.unique_games }}</h2>
+    </article>
+    
+    <article>
+        <header>🎵 Spotify Listened</header>
+        <h2>{{ overview.total_spotify_readable }}</h2>
+    </article>
+    
+    <article>
+        <header>🎶 Unique Songs</header>
+        <h2>{{ overview.unique_tracks }}</h2>
+    </article>
+</div>
+
+<div class="grid">
+    <section>
+        <h2>🏆 Top Games</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Game</th>
+                    <th>Playtime</th>
+                    <th>Players</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in top_games %}
+                <tr>
+                    <td>{{ game.rank }}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.2em;">🎮</span>
+                            <strong>{{ game.name }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ game.readable }}</td>
+                    <td>{{ game.unique_players }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/games" role="button" class="secondary">View All Games →</a>
+    </section>
+
+    <section>
+        <h2>🎵 Top Tracks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Track</th>
+                    <th>Playtime</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for track in top_tracks %}
+                <tr>
+                    <td>{{ track.rank }}</td>
+                    <td>
+                        <strong>{{ track.title }}</strong><br>
+                        <small>{{ track.artist }}</small>
+                    </td>
+                    <td>{{ track.readable }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/spotify" role="button" class="secondary">View All Tracks →</a>
+    </section>
+</div>
+
+<section>
+    <h2>📊 Activity Distribution</h2>
+    <canvas id="activityChart" style="max-height: 400px;"></canvas>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Create activity chart
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Gaming', 'Spotify'],
+            datasets: [{
+                data: [{{ overview.total_game_hours }}, {{ overview.total_spotify_hours }}],
+                backgroundColor: ['#3b82f6', '#1db954'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#fff', font: { size: 14 } }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

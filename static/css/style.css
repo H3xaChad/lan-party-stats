@@ -1,0 +1,573 @@
+/* Custom styles for LAN Party Stats */
+
+:root {
+    --primary: #3b82f6;
+    --secondary: #1db954;
+    --accent: #f59e0b;
+    --gold: #fbbf24;
+    --silver: #9ca3af;
+    --bronze: #cd7f32;
+}
+
+body {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    min-height: 100vh;
+}
+
+nav {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+nav a.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+}
+
+article {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    transition: transform 0.2s, border-color 0.2s;
+    text-align: center;
+}
+
+article:hover {
+    transform: translateY(-4px);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+article header {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+article h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6 0%, #1db954 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0.5rem 0;
+}
+
+table {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+table thead {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+footer {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(59, 130, 246, 0.2);
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 3rem;
+}
+
+section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(30, 41, 59, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+h1, h2 {
+    color: #fff;
+}
+
+/* Override Pico's container max-width for wider tables */
+main.container {
+    max-width: 85%;
+    width: 85%;
+}
+
+a {
+    color: var(--primary);
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #60a5fa;
+}
+
+[role="button"].secondary {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Loading animation for HTMX */
+.htmx-request {
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+/* Chart containers */
+canvas {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+/* Tab navigation */
+.tab-btn {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.tab-btn.active {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Podium styling for leaderboard rows */
+tr.podium-1 {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%);
+}
+
+tr.podium-2 {
+    background: linear-gradient(90deg, rgba(156, 163, 175, 0.15) 0%, transparent 100%);
+}
+
+tr.podium-3 {
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.15) 0%, transparent 100%);
+}
+
+/* Leaderboard Header */
+.leaderboard-header {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.leaderboard-header h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #1db954 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.leaderboard-header p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+}
+
+/* Leaderboard Section */
+.leaderboard-section {
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.table-container {
+    overflow-x: auto;
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 1rem;
+}
+
+/* Leaderboard Table */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.leaderboard-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.leaderboard-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.leaderboard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Medal and rank styling */
+.medal {
+    font-size: 2rem;
+    display: inline-block;
+}
+
+.rank-number {
+    font-size: 1.3rem;
+    color: var(--primary);
+}
+
+.rank-col {
+    width: 80px;
+    text-align: center;
+}
+
+/* Player name link */
+.player-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.player-link:hover {
+    color: var(--primary);
+    transform: translateX(4px);
+}
+
+/* Avatar images */
+.player-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+
+.player-link:hover .player-avatar-small {
+    transform: scale(1.1);
+}
+
+/* Time values */
+.time-value {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.hours-value {
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 0.5rem;
+}
+
+/* Game info in leaderboard */
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.game-name {
+    font-weight: 500;
+    color: #fff;
+}
+
+.game-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+/* Count badges */
+.count-badge {
+    display: inline-block;
+    background: rgba(59, 130, 246, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* No value styling (for zero values) */
+.no-value {
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 400;
+}
+
+/* Game icon placeholder styling */
+.game-icon-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 185, 84, 0.2));
+    font-size: 1.5em;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.game-icon-placeholder:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 185, 84, 0.3));
+}
+
+/* Player Page Styles */
+.player-header {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.player-info-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.player-info-row .stat-card {
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.player-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary);
+    object-fit: cover;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.player-name-section {
+    flex-grow: 1;
+}
+
+.player-name {
+    font-size: 2.5rem;
+    margin: 0;
+    background: linear-gradient(135deg, #3b82f6 0%, #1db954 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.player-stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    transition: transform 0.2s, border-color 0.2s;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.stat-card header {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6 0%, #1db954 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0.5rem 0;
+}
+
+/* Section headers */
+.section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Games and Spotify sections */
+.games-section,
+.spotify-section {
+    margin-bottom: 2rem;
+}
+
+.games-section h2,
+.spotify-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+/* Spotify summary */
+.spotify-summary {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+    background: rgba(29, 185, 84, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(29, 185, 84, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.summary-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summary-stat .label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.summary-stat .value {
+    color: var(--secondary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Games and Spotify tables */
+.games-table,
+.spotify-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.games-table th,
+.spotify-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.games-table td,
+.spotify-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.game-row.top-game {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, transparent 100%);
+}
+
+/* No data message */
+.no-data {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Back button */
+.back-button-container {
+    margin-top: 2rem;
+}
+
+.back-button {
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    article h2 {
+        font-size: 2rem;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .leaderboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .player-info-row {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .player-name {
+        font-size: 2rem;
+    }
+    
+    .player-avatar-large {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .stat-card h2 {
+        font-size: 2rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .leaderboard-table {
+        font-size: 0.85rem;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 0.5rem;
+    }
+    
+    .medal {
+        font-size: 1.5rem;
+    }
+    
+    .spotify-summary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .player-avatar-small {
+        width: 24px;
+        height: 24px;
+    }
+}
+

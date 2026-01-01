@@ -1,0 +1,32 @@
+<section hx-get="/htmx/leaderboard" hx-trigger="every 30s" hx-swap="outerHTML">
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Total Playtime</th>
+                <th>Games Played</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in leaders %}
+            <tr>
+                <td>
+                    {% if player.rank == 1 %}🥇
+                    {% elif player.rank == 2 %}🥈
+                    {% elif player.rank == 3 %}🥉
+                    {% else %}{{ player.rank }}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/player/{{ player.user_id }}">
+                        <strong>{{ player.display_name or player.username }}</strong>
+                    </a>
+                </td>
+                <td>{{ player.readable }} <small>({{ player.hours }}h)</small></td>
+                <td>{{ player.games_played }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>

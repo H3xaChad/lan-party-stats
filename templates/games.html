@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Top Games - LAN Party Stats{% endblock %}
+
+{% block content %}
+<header class="leaderboard-header">
+    <h1>🎮 Top Games</h1>
+    <p>Most played games by total playtime</p>
+</header>
+
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Game</th>
+                <th>Total Playtime</th>
+                <th>Unique Players</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+            <tr>
+                <td>{{ game.rank }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="game-icon-placeholder">🎮</div>
+                        <strong>{{ game.name }}</strong>
+                    </div>
+                </td>
+                <td>{{ game.readable }} <small>({{ game.hours }}h)</small></td>
+                <td>{{ game.unique_players }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>📊 Top 10 Games Chart</h2>
+    <canvas id="gamesChart" style="max-height: 500px;"></canvas>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ctx = document.getElementById('gamesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for g in games[:10] %}'{{ g.name }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Hours Played',
+                data: [{% for g in games[:10] %}{{ g.hours }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#10b981',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { color: '#fff' },
+                    grid: { color: '#374151' }
+                },
+                y: {
+                    ticks: { color: '#fff' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

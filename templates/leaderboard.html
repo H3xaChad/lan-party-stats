@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - LAN Party Stats{% endblock %}
+
+{% block content %}
+<header class="leaderboard-header">
+    <h1>🏆 Player Leaderboard</h1>
+    <p>Complete statistics for all players ranked by total playtime</p>
+</header>
+
+<section class="leaderboard-section">
+    <div class="table-container">
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th class="rank-col">Rank</th>
+                    <th class="name-col">Player</th>
+                    <th class="playtime-col">Total Playtime</th>
+                    <th class="top-game-col">Most Played Game</th>
+                    <th class="games-col">Games Played</th>
+                    <th class="spotify-time-col">Spotify Playtime</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in leaders %}
+                <tr class="player-row {% if player.rank <= 3 %}podium-{{ player.rank }}{% endif %}">
+                    <td class="rank-cell">
+                        {% if player.rank == 1 %}
+                            <span class="medal gold">🥇</span>
+                        {% elif player.rank == 2 %}
+                            <span class="medal silver">🥈</span>
+                        {% elif player.rank == 3 %}
+                            <span class="medal bronze">🥉</span>
+                        {% else %}
+                            <strong class="rank-number">{{ player.rank }}</strong>
+                        {% endif %}
+                    </td>
+                    <td class="name-cell">
+                        <a href="/player/{{ player.user_id }}" class="player-link">
+                            <img src="{{ player.avatar_url or 'https://cdn.discordapp.com/embed/avatars/' ~ ((player.user_id // 4194304) % 6) ~ '.png?size=64' }}" alt="{{ player.display_name or player.username }}" class="player-avatar-small" loading="lazy">
+                            <strong>{{ player.display_name or player.username }}</strong>
+                        </a>
+                    </td>
+                    <td class="playtime-cell">
+                        {% if player.total_seconds == 0 %}
+                            <span class="no-value">—</span>
+                        {% else %}
+                            <strong class="time-value">{{ player.readable }}</strong>
+                        {% endif %}
+                    </td>
+                    <td class="top-game-cell">
+                        <div class="game-info">
+                            <span class="game-name">{{ player.most_played_game }}</span>
+                            {% if player.games_played > 0 %}
+                                <small class="game-time">{{ player.most_played_game_readable }}</small>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="games-cell">
+                        {% if player.games_played == 0 %}
+                            <span class="no-value">—</span>
+                        {% else %}
+                            <span class="count-badge">{{ player.games_played }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="spotify-time-cell">
+                        {% if player.spotify_total_seconds == 0 %}
+                            <span class="no-value">—</span>
+                        {% else %}
+                            <strong class="time-value">{{ player.spotify_readable }}</strong>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        location.reload();
+    }, 30000);
+</script>
+{% endblock %}

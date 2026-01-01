@@ -1,0 +1,33 @@
+# Environment
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Database
+stats.db
+
+# UV
+.venv/
+.uv/
+uv.lock
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+bot.log
+web.log
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+
+# Build
+*.egg-info/
+
+# Stuff
+data/
+scripts/

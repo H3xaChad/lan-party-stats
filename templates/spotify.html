@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Top Spotify Tracks - LAN Party Stats{% endblock %}
+
+{% block content %}
+<header class="leaderboard-header">
+    <h1>🎵 Top Spotify Tracks</h1>
+    <p>Most listened tracks by total time</p>
+</header>
+
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Track</th>
+                <th>Artist</th>
+                <th>Total Listening Time</th>
+                <th>Listeners</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for track in tracks %}
+            <tr>
+                <td>{{ track.rank }}</td>
+                <td><strong>{{ track.title }}</strong></td>
+                <td>{{ track.artist }}</td>
+                <td>{{ track.readable }} <small>({{ track.hours }}h)</small></td>
+                <td>{{ track.unique_listeners }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>📊 Top 10 Tracks Chart</h2>
+    <canvas id="spotifyChart" style="max-height: 500px;"></canvas>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const ctx = document.getElementById('spotifyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for t in tracks[:10] %}'{{ t.title[:30] }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Hours Listened',
+                data: [{% for t in tracks[:10] %}{{ t.hours }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#1db954',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { color: '#fff' },
+                    grid: { color: '#374151' }
+                },
+                y: {
+                    ticks: { color: '#fff' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
