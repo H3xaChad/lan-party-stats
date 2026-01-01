@@ -19,18 +19,19 @@ logger = logging.getLogger(__name__)
 class LanPartyBot(commands.Bot):
     """The main bot class."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, db_path: str = "stats.db", **kwargs):
         super().__init__(*args, **kwargs)
         self.db: Optional[Database] = None
         self.tracker: Optional[ActivityTracker] = None
         self.stats_manager: Optional[StatsManager] = None
         self._shutdown = False
+        self._db_path = db_path
 
     async def setup_hook(self):
         """Initialize database, components, and sync commands."""
         logger.info("Initializing components...")
         try:
-            self.db = Database()
+            self.db = Database(self._db_path)
             await self.db.connect()
             logger.info("Database connected")
             
@@ -85,17 +86,17 @@ class LanPartyBot(commands.Bot):
         logger.info("Shutdown complete")
 
 
-def create_bot() -> LanPartyBot:
+def create_bot(db_path: str = "stats.db") -> LanPartyBot:
     """Create and configure the Discord bot instance."""
     intents = discord.Intents.default()
     intents.presences = True
     intents.members = True
-    return LanPartyBot(command_prefix="!", intents=intents)
+    return LanPartyBot(command_prefix="!", intents=intents, db_path=db_path)
 
 
 async def run_bot(token: str, db_path: str = "stats.db"):
     """Run the bot and handle graceful shutdown."""
-    bot = create_bot()
+    bot = create_bot(db_path)
     shutdown_event = asyncio.Event()
     
     def signal_handler(sig, frame):

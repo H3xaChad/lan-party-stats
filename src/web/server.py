@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 import sys
 from pathlib import Path
 import logging
+import os
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from bot.database import Database
@@ -26,7 +27,8 @@ async def lifespan(app: FastAPI):
     # Startup
     global db, stats
     logger.info("Starting web server...")
-    db = Database()
+    db_path = os.getenv("DATABASE_PATH", "stats.db")
+    db = Database(db_path)
     await db.connect()
     stats = StatsManager(db)
     logger.info("Web server initialized")

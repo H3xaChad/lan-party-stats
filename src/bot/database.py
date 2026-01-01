@@ -212,10 +212,14 @@ class Database:
         """Get top games by total playtime."""
         async with self._connection.cursor() as cursor:
             await cursor.execute("""
-                SELECT g.game_name, SUM(gs.duration_seconds) as total_seconds, COUNT(DISTINCT gs.user_id) as unique_players
-                FROM game_sessions gs JOIN games g ON gs.game_id = g.game_id
-                WHERE gs.duration_seconds IS NOT NULL
-                GROUP BY g.game_id ORDER BY total_seconds DESC LIMIT ?
+                SELECT g.game_name, 
+                       COALESCE(SUM(gs.duration_seconds), 0) as total_seconds, 
+                       COUNT(DISTINCT gs.user_id) as unique_players
+                FROM games g 
+                LEFT JOIN game_sessions gs ON gs.game_id = g.game_id
+                GROUP BY g.game_id 
+                ORDER BY total_seconds DESC 
+                LIMIT ?
             """, (limit,))
             return await cursor.fetchall()
     
