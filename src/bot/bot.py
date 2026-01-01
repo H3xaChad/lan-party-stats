@@ -26,6 +26,7 @@ class LanPartyBot(commands.Bot):
         self.stats_manager: Optional[StatsManager] = None
         self._shutdown = False
         self._db_path = db_path
+        self._session_validator_task: Optional[asyncio.Task] = None
 
     async def setup_hook(self):
         """Initialize database, components, and sync commands."""
@@ -42,6 +43,10 @@ class LanPartyBot(commands.Bot):
             await setup_commands(self, self.stats_manager)
             synced = await self.tree.sync()
             logger.info(f"Synced {len(synced)} commands")
+            
+            # Start background session validator
+            self._session_validator_task = self.loop.create_task(self._validate_sessions_periodically())
+            logger.info("Session validator started")
         except Exception as e:
             logger.error(f"Setup failed: {e}", exc_info=True)
             raise
@@ -54,6 +59,44 @@ class LanPartyBot(commands.Bot):
         logger.info(f"Connected as {self.user} | {guild_text}")
         if self.tracker:
             await self.tracker.initialize_from_current_state(self)
+    
+    async def _validate_sessions_periodically(self):
+        """Background task to validate and cap overly long sessions."""
+        await self.wait_until_ready()
+        
+        while not self.is_closed() and not self._shutdown:
+            try:
+                # Wait 1 hour between checks
+                await asyncio.sleep(3600)
+                
+                if self.db and self.tracker:
+                    # Find and cap sessions exceeding max duration
+                    orphaned_games, orphaned_spotify = await self.db.get_all_orphaned_sessions(
+                        self.tracker.max_session_hours
+                    )
+                    
+                    if orphaned_games or orphaned_spotify:
+                        logger.warning(
+                            f"Found {len(orphaned_games)} game and {len(orphaned_spotify)} Spotify sessions "
+                            f"exceeding {self.tracker.max_session_hours}h - capping them"
+                        )
+                        
+                        for session_id in orphaned_games:
+                            await self.db.close_orphaned_session_with_cap(
+                                session_id, 'game_sessions', self.tracker.max_session_hours
+                            )
+                        
+                        for session_id in orphaned_spotify:
+                            await self.db.close_orphaned_session_with_cap(
+                                session_id, 'spotify_sessions', self.tracker.max_session_hours
+                            )
+                        
+                        logger.info("Long-running sessions capped successfully")
+            
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Session validation error: {e}", exc_info=True)
 
     async def on_presence_update(self, before: discord.Member, after: discord.Member):
         """Track user activity changes."""
@@ -75,6 +118,14 @@ class LanPartyBot(commands.Bot):
         self._shutdown = True
         
         try:
+            # Cancel background tasks
+            if self._session_validator_task and not self._session_validator_task.done():
+                self._session_validator_task.cancel()
+                try:
+                    await self._session_validator_task
+                except asyncio.CancelledError:
+                    pass
+            
             if self.tracker:
                 await self.tracker.cleanup_active_sessions()
             if self.db:

@@ -192,6 +192,81 @@ class Database:
             """, (user_id,))
             return await cursor.fetchone()
     
+    async def get_all_orphaned_sessions(self, max_hours: int = 12) -> Tuple[List[int], List[int]]:
+        """Get all orphaned sessions (no end_time) older than max_hours.
+        
+        Returns:
+            Tuple of (game_session_ids, spotify_session_ids)
+        """
+        async with self._connection.cursor() as cursor:
+            # Get orphaned game sessions
+            await cursor.execute("""
+                SELECT session_id
+                FROM game_sessions
+                WHERE end_time IS NULL
+                AND (julianday(CURRENT_TIMESTAMP) - julianday(start_time)) * 24 > ?
+            """, (max_hours,))
+            orphaned_games = [row[0] for row in await cursor.fetchall()]
+            
+            # Get orphaned spotify sessions
+            await cursor.execute("""
+                SELECT session_id
+                FROM spotify_sessions
+                WHERE end_time IS NULL
+                AND (julianday(CURRENT_TIMESTAMP) - julianday(start_time)) * 24 > ?
+            """, (max_hours,))
+            orphaned_spotify = [row[0] for row in await cursor.fetchall()]
+            
+            return (orphaned_games, orphaned_spotify)
+    
+    async def close_orphaned_session_with_cap(self, session_id: int, table: str, max_hours: int = 12):
+        """Close an orphaned session with a duration cap to prevent corruption.
+        
+        Args:
+            session_id: The session ID to close
+            table: Either 'game_sessions' or 'spotify_sessions'
+            max_hours: Maximum duration to record (default 12 hours)
+        """
+        async with self._connection.cursor() as cursor:
+            await cursor.execute(f"""
+                UPDATE {table}
+                SET end_time = datetime(start_time, '+{max_hours} hours'),
+                    duration_seconds = ?
+                WHERE session_id = ?
+            """, (max_hours * 3600, session_id))
+            await self._connection.commit()
+    
+    async def get_recent_orphaned_sessions(self, max_minutes: int = 5) -> Tuple[List[Tuple], List[Tuple]]:
+        """Get recently orphaned sessions (likely from a crash/restart).
+        
+        Returns sessions without end_time that are less than max_minutes old.
+        Returns:
+            Tuple of (game_sessions, spotify_sessions)
+            Each as list of (session_id, user_id, game_id/track_id)
+        """
+        async with self._connection.cursor() as cursor:
+            # Get recent orphaned game sessions
+            await cursor.execute("""
+                SELECT session_id, user_id, game_id
+                FROM game_sessions
+                WHERE end_time IS NULL
+                AND (julianday(CURRENT_TIMESTAMP) - julianday(start_time)) * 1440 <= ?
+                ORDER BY start_time DESC
+            """, (max_minutes,))
+            recent_games = await cursor.fetchall()
+            
+            # Get recent orphaned spotify sessions
+            await cursor.execute("""
+                SELECT session_id, user_id, track_id
+                FROM spotify_sessions
+                WHERE end_time IS NULL
+                AND (julianday(CURRENT_TIMESTAMP) - julianday(start_time)) * 1440 <= ?
+                ORDER BY start_time DESC
+            """, (max_minutes,))
+            recent_spotify = await cursor.fetchall()
+            
+            return (recent_games, recent_spotify)
+    
     async def get_user_total_playtime(self, user_id: int) -> int:
         """Get total playtime in seconds for user."""
         async with self._connection.cursor() as cursor:
