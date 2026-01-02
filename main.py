@@ -29,16 +29,9 @@ def setup_logging():
         BOLD = '\033[1m'
         
         def format(self, record):
-            # Simplify logger names
-            logger_name = record.name.replace('bot.', '').replace('discord.', 'discord.')
-            if logger_name == 'root':
-                logger_name = 'root'
-            
-            # Color-code level
+            logger_name = record.name.replace('bot.', '')
             level_color = self.COLORS.get(record.levelname, '')
             level = f"{level_color}{record.levelname:<8}{self.RESET}"
-            
-            # Format message
             timestamp = self.formatTime(record, '%H:%M:%S')
             msg = f"{self.BOLD}{timestamp}{self.RESET} {level} {logger_name:<12} {record.getMessage()}"
             
@@ -47,21 +40,17 @@ def setup_logging():
             
             return msg
     
-    # File formatter (no colors)
     file_formatter = logging.Formatter(
         '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
-    # Console handler with colors
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(CleanFormatter())
     
-    # File handler without colors
     file_handler = logging.FileHandler('bot.log')
     file_handler.setFormatter(file_formatter)
     
-    # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
     root_logger.handlers.clear()

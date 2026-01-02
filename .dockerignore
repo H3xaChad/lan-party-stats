@@ -1,72 +1,23 @@
-# Git
 .git/
 .gitignore
-
-# Environment
 .env
 .env.*
-
-# Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-
-# Virtual environments
 .venv/
-venv/
 .uv/
 uv.lock
-
-# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Logs
 *.log
-bot.log
-web.log
-
-# Testing
 .pytest_cache/
 .ruff_cache/
-.coverage
-htmlcov/
-
-# Build
-build/
-dist/
 *.egg-info/
-*.egg
-
-# Database
 *.db
-*.sqlite
-*.sqlite3
-stats.db
-
-# Docker
 Dockerfile
 docker-compose.yml
 .dockerignore
-
-# Documentation
-README.md
-WEB_README.md
 *.md
-
-# Scripts (not needed in container)
 scripts/
-
-# Data
 data/
-
-# Makefile
 Makefile
-
-# Setup files (already processed)
-setup.py
