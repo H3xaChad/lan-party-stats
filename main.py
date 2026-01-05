@@ -72,15 +72,20 @@ def main():
     
     token = os.getenv("DISCORD_TOKEN")
     db_path = os.getenv("DATABASE_PATH", "stats.db")
+    guild_id = os.getenv("DISCORD_GUILD_ID")
     
     if not token:
         logger.error("DISCORD_TOKEN not set in .env file")
         return 1
     
-    logger.info(f"Starting LAN Party Stats Bot (db: {db_path})")
+    guild_id_int = int(guild_id) if guild_id else None
+    if guild_id_int:
+        logger.info(f"Starting LAN Party Stats Bot (db: {db_path}, guild: {guild_id_int})")
+    else:
+        logger.info(f"Starting LAN Party Stats Bot (db: {db_path}, monitoring all guilds)")
     
     try:
-        asyncio.run(run_bot(token, db_path))
+        asyncio.run(run_bot(token, db_path, guild_id_int))
     except KeyboardInterrupt:
         pass
     except Exception as e:

@@ -48,7 +48,6 @@ services:
     environment:
       - TZ=Europe/Berlin
       - DATABASE_PATH=/data/stats.db
-      - WEB_HOST=0.0.0.0
       - WEB_PORT=5000
     networks:
       - lan-party-net

@@ -25,18 +25,16 @@ def main():
     setup_logging()
     load_dotenv()
     
-    host = os.getenv("WEB_HOST", "0.0.0.0")
     port = int(os.getenv("WEB_PORT", "5000"))
     
-    print(f"🌐 Starting LAN Party Stats web server on http://{host}:{port}")
-    logging.info(f"Starting web server on {host}:{port}")
+    logging.info(f"Starting web server on 0.0.0.0:{port}")
     
     import uvicorn
     from web.server import app
     
     uvicorn.run(
         app,
-        host=host,
+        host="0.0.0.0",
         port=port,
         log_level="info"
     )

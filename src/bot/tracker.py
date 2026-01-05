@@ -140,7 +140,7 @@ class ActivityTracker:
         
         self.active_sessions.clear()
     
-    async def initialize_from_current_state(self, bot):
+    async def initialize_from_current_state(self, bot, guild_id: Optional[int] = None):
         """Initialize tracker from current Discord state and recover from crashes.
         
         This method recovers ALL orphaned sessions regardless of age by:
@@ -174,7 +174,10 @@ class ActivityTracker:
         user_game_sessions = {(user_id, game_id): (session_id, user_id, game_id) for session_id, user_id, game_id in orphaned_games}
         user_spotify_sessions = {(user_id, track_id): (session_id, user_id, track_id) for session_id, user_id, track_id in orphaned_spotify}
         
-        for guild in bot.guilds:
+        # Filter guilds by guild_id if specified
+        guilds = [g for g in bot.guilds if guild_id is None or g.id == guild_id]
+        
+        for guild in guilds:
             for member in guild.members:
                 if member.bot:
                     continue

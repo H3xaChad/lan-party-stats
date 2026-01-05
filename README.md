@@ -1,55 +1,87 @@
-# LAN Party Stats Bot
+# LAN Party Stats
 
-Discord bot that tracks game playtime and Spotify listening statistics.
+Discord bot that tracks gaming and Spotify activity with a web dashboard.
 
-## Quick Start
+## Setup
 
+1. **Create Discord Bot** at [Discord Developer Portal](https://discord.com/developers/applications)
+   - Enable **Privileged Gateway Intents**: `PRESENCE` and `SERVER MEMBERS`
+   - Copy bot token
+
+2. **Configure Environment**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and add your `DISCORD_TOKEN` and `DISCORD_GUILD_ID`
+   
+   _Note: without guild id data will be gathered from ALL servers the bot is on!_
+
+3. **Invite Bot** to your server with permissions: `bot` + `applications.commands`
+
+## Running
+
+### Native (uv)
+
+Install dependencies:
 ```bash
-make install    # Install dependencies and create .env
-# Edit .env and add your DISCORD_TOKEN
-make run        # Start the bot
+uv sync --extra web
 ```
 
-## Discord Bot Setup
+Start Discord bot:
+```bash
+uv run python main.py
+```
 
-1. Create bot at [Discord Developer Portal](https://discord.com/developers/applications)
-2. Copy bot token to `.env`
-3. Enable **Privileged Gateway Intents**:
-   - PRESENCE INTENT (required)
-   - SERVER MEMBERS INTENT (required)
-4. Invite bot with `bot` and `applications.commands` scopes
+Start web dashboard:
+```bash
+uv run python web_main.py
+```
 
-## Commands
+### Docker
 
-- `/stats [user]` - Gaming statistics
-- `/leaderboard` - Top players
-- `/topgames` - Most played games
-- `/game <name>` - Game details
-- `/spotify [user]` - Spotify stats
-- `/topsongs` - Top tracks
-- `/overview` - Server overview
+Build containers:
+```bash
+docker compose build
+```
 
-## Database
+Start services:
+```bash
+docker compose up -d
+```
 
-SQLite with session-based tracking:
-- `users` - User information
-- `games` - Game catalog
-- `spotify_tracks` - Track catalog
-- `game_sessions` - Gaming sessions with timestamps
-- `spotify_sessions` - Listening sessions with timestamps
+View logs:
+```bash
+docker compose logs -f
+```
 
-Optimized with indexes for fast queries. View with: `sqlite3 stats.db`
+Stop services:
+```bash
+docker compose down
+```
+
+Clean up (remove volumes and images):
+```bash
+docker compose down -v --rmi local
+```
 
 ## Configuration
 
-`.env` file:
-```env
-DISCORD_TOKEN=your_token_here
-DATABASE_PATH=stats.db
-```
+Required in `.env`:
+- `DISCORD_TOKEN` - Bot token from Discord Developer Portal
+- `DISCORD_GUILD_ID` - Server ID to monitor (right-click server → Copy ID)
 
-## Troubleshooting
+Optional:
+- `DATABASE_PATH` - Database file location (default: `stats.db`)
+- `WEB_PORT` - Web dashboard port (default: `5000`)
 
-- **Bot doesn't track activities**: Enable PRESENCE INTENT in Discord Portal
-- **Commands not showing**: Wait 1-2 minutes for Discord to sync
-- **Database errors**: Check write permissions and disk space
+## Commands
+
+- `/stats [user]` - View gaming stats
+- `/leaderboard` - Top players
+- `/game <name>` - Game details
+- `/spotify [user]` - Spotify listening stats
+- `/overview` - Server overview
+
+## License
+
+MIT

@@ -19,13 +19,14 @@ logger = logging.getLogger(__name__)
 class LanPartyBot(commands.Bot):
     """The main bot class."""
 
-    def __init__(self, *args, db_path: str = "stats.db", **kwargs):
+    def __init__(self, *args, db_path: str = "stats.db", guild_id: Optional[int] = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.db: Optional[Database] = None
         self.tracker: Optional[ActivityTracker] = None
         self.stats_manager: Optional[StatsManager] = None
         self._shutdown = False
         self._db_path = db_path
+        self._guild_id = guild_id
 
     async def setup_hook(self):
         """Initialize database, components, and sync commands."""
@@ -52,11 +53,16 @@ class LanPartyBot(commands.Bot):
         """Called when the bot is ready and connected to Discord."""
         guild_text = f"{len(self.guilds)} guild(s)" if len(self.guilds) != 1 else "1 guild"
         logger.info(f"Connected as {self.user} | {guild_text}")
+        if self._guild_id and self._guild_id not in [g.id for g in self.guilds]:
+            logger.warning(f"Configured guild ID {self._guild_id} not found! Bot is in guilds: {[g.id for g in self.guilds]}")
         if self.tracker:
-            await self.tracker.initialize_from_current_state(self)
+            await self.tracker.initialize_from_current_state(self, self._guild_id)
 
     async def on_presence_update(self, before: discord.Member, after: discord.Member):
         """Track user activity changes."""
+        # Only track if guild_id is not set or matches the configured guild
+        if self._guild_id and after.guild.id != self._guild_id:
+            return
         if after.bot or not self.tracker:
             return
         try:
@@ -86,17 +92,17 @@ class LanPartyBot(commands.Bot):
         logger.info("Shutdown complete")
 
 
-def create_bot(db_path: str = "stats.db") -> LanPartyBot:
+def create_bot(db_path: str = "stats.db", guild_id: Optional[int] = None) -> LanPartyBot:
     """Create and configure the Discord bot instance."""
     intents = discord.Intents.default()
     intents.presences = True
     intents.members = True
-    return LanPartyBot(command_prefix="!", intents=intents, db_path=db_path)
+    return LanPartyBot(command_prefix="!", intents=intents, db_path=db_path, guild_id=guild_id)
 
 
-async def run_bot(token: str, db_path: str = "stats.db"):
+async def run_bot(token: str, db_path: str = "stats.db", guild_id: Optional[int] = None):
     """Run the bot and handle graceful shutdown."""
-    bot = create_bot(db_path)
+    bot = create_bot(db_path, guild_id)
     shutdown_event = asyncio.Event()
     
     def signal_handler(sig, frame):
